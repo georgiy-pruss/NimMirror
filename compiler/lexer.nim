@@ -151,14 +151,12 @@ proc isKeyword*(kind: TTokType): bool =
 
 template ones(n): untyped = ((1 shl n)-1) # for utf-8 conversion
 
-proc isNimIdentifier*(s: string): bool =
-  if s[0] in SymStartChars:
+proc isNimIdentifier*(s: string, main = false): bool =
+  if s[0] in SymStartChars or s[0] == '_' or (main and s[0] in {'0'..'9'}):
     var i = 1
     var sLen = s.len
     while i < sLen:
-      if s[i] == '_':
-        inc(i)
-      if s[i] notin SymChars: return
+      if s[i] notin SymChars and s[i] != '_': return
       inc(i)
     result = true
 

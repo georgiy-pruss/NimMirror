@@ -121,7 +121,7 @@ when false:
 proc resetSystemArtifacts*() =
   magicsys.resetSysTypes()
 
-proc newModule(graph: ModuleGraph; fileIdx: int32): PSym =
+proc newModule(graph: ModuleGraph; fileIdx: int32, main = false ): PSym =
   # We cannot call ``newSym`` here, because we have to circumvent the ID
   # mechanism, which we do in order to assign each module a persistent ID.
   new(result)
@@ -129,7 +129,7 @@ proc newModule(graph: ModuleGraph; fileIdx: int32): PSym =
   result.kind = skModule
   let filename = fileIdx.toFullPath
   result.name = getIdent(splitFile(filename).name)
-  if not isNimIdentifier(result.name.s):
+  if not isNimIdentifier(result.name.s, main):
     rawMessage(errInvalidModuleName, result.name.s)
 
   result.info = newLineInfo(fileIdx, 1, 1)
@@ -163,7 +163,7 @@ proc compileModule*(graph: ModuleGraph; fileIdx: int32; cache: IdentCache, flags
   if result == nil:
     #growCache gMemCacheData, fileIdx
     #gMemCacheData[fileIdx].needsRecompile = Probing
-    result = newModule(graph, fileIdx)
+    result = newModule(graph, fileIdx, sfMainModule in flags)
     var rd: PRodReader
     result.flags = result.flags + flags
     if sfMainModule in result.flags:

@@ -1046,6 +1046,8 @@ proc getSomeInitName(m: PSym, suffix: string): Rope =
   if {sfSystemModule, sfMainModule} * m.flags == {}:
     result = m.owner.name.s.mangle.rope
     result.add "_"
+  if sfMainModule in m.flags and m.name.s[0] in {'0'..'9'}:
+    result.add "_"
   result.add m.name.s
   result.add suffix
 
